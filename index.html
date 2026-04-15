@@ -165,9 +165,15 @@
       <div class="stat-card"><div class="stat-val" id="stat-na">—</div><div class="stat-lbl">Not applicable</div></div>
     </div>
     <div class="results-toolbar">
-      <div class="section-label" style="margin:0;">All responses</div>
-      <button id="export-btn" class="btn-export" onclick="exportCSV()">Export CSV</button>
-    </div>
+  <div class="section-label">All responses</div>
+
+  <div style="display:flex; gap:8px;">
+    <button onclick="unlockAdmin()" class="btn-export">Admin</button>
+    <button id="export-btn" class="btn-export" onclick="exportCSV()" style="display:none;">
+      Export CSV
+    </button>
+  </div>
+</div>
     <div id="results-list">
       <div class="loading-state"><span class="spinner"></span>Loading responses…</div>
     </div>
@@ -177,7 +183,9 @@
 <script>
 const ADMIN_EMAIL = "LuckmansDP@gmail.com";
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCeyjGOMeeLwMITZsVjWbDXpjwnLlQUSdzKjKqJIvHZ2fuoIZ9Z9FU9ywRyt3uZ4AuDQ/exec';
-
+const ADMIN_PASSWORD = "luckmans"; 
+let isAdmin = false;
+ 
 let cachedResponses = null;
 
 function switchTab(tab, btn) {
@@ -196,6 +204,16 @@ function checkAdminAccess() {
   // ONLY control button visibility
   btn.style.display = (email === ADMIN_EMAIL) ? 'inline-block' : 'none';
 }
+ function unlockAdmin() {
+  const pass = prompt("Enter admin password");
+
+  if (pass === ADMIN_PASSWORD) {
+    isAdmin = true;
+    document.getElementById('export-btn').style.display = 'inline-block';
+    alert("Admin access granted");
+  } else {
+    alert("Wrong password");
+  }
 }
 function renderDevices() {
   const val = document.getElementById('fdevices').value;
