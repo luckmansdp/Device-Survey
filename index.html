@@ -111,7 +111,7 @@
         <div class="field">
           <label for="femail">Email address</label>
           <div style="position:relative;">
-            <input type="email" id="femail" placeholder="jane@company.com" autocomplete="off" oninput="suggestEmail(); checkAdminAccess();" />
+            <input type="email" id="femail" placeholder="jane@company.com" autocomplete="off" oninput="suggestEmail();" />
             <div id="email-suggestions" style="
               position:absolute;
               top:42px;
@@ -181,7 +181,7 @@
 
 </div>
 <script>
-const ADMIN_EMAIL = "LuckmansDP@gmail.com";
+
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCeyjGOMeeLwMITZsVjWbDXpjwnLlQUSdzKjKqJIvHZ2fuoIZ9Z9FU9ywRyt3uZ4AuDQ/exec';
 const ADMIN_PASSWORD = "luckmans"; 
 let isAdmin = false;
@@ -195,15 +195,7 @@ function switchTab(tab, btn) {
   document.getElementById('panel-' + tab).classList.add('active');
   if (tab === 'results') loadResults();
 }
-function checkAdminAccess() {
-  const email = document.getElementById('femail').value.trim().toLowerCase();
-  const btn = document.getElementById('export-btn');
 
-  if (!btn) return;
-
-  // ONLY control button visibility
-  btn.style.display = (email === ADMIN_EMAIL) ? 'inline-block' : 'none';
-}
  function unlockAdmin() {
   const pass = prompt("Enter admin password");
 
@@ -361,13 +353,10 @@ function renderResults(responses) {
 }
 
 function exportCSV() {
-  const email = document.getElementById('femail').value.trim().toLowerCase();
-
-  // 🔒 Block non-admins
-  if (email !== ADMIN_EMAIL) {
-    alert("Access denied");
-    return;
-  }
+  if (!isAdmin) {
+  alert("Access denied");
+  return;
+}
 
   if (!cachedResponses || !cachedResponses.length) {
     alert('No responses to export yet.');
