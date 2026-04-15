@@ -230,15 +230,25 @@
 
     const isNA = deviceSel === 'na';
     const devices = [];
+
     if (!isNA) {
       const n = parseInt(deviceSel);
+    
       for (let i = 1; i <= n; i++) {
+        const make = document.getElementById('make' + i)?.value.trim();
+        const model = document.getElementById('model' + i)?.value.trim();
+        const os = document.getElementById('os' + i)?.value.trim();
+    
         if (!make || !model || !os) {
           alert(`Please fill all fields for device ${i}`);
-          btn.disabled = false;
-          btn.textContent = 'Submit response';
+          document.getElementById('submit-btn').disabled = false;
+          document.getElementById('submit-btn').textContent = 'Submit response';
           return;
         }
+
+    devices.push({ make, model, os });
+  }
+}
 
         devices.push({ make, model, os });
       }
