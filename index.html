@@ -191,11 +191,11 @@ function checkAdminAccess() {
   const email = document.getElementById('femail').value.trim().toLowerCase();
   const btn = document.getElementById('export-btn');
 
-  if (email === ADMIN_EMAIL) {
-    btn.style.display = 'inline-block';
-  } else {
-    btn.style.display = 'none';
-  }
+  if (!btn) return;
+
+  // ONLY control button visibility
+  btn.style.display = (email === ADMIN_EMAIL) ? 'inline-block' : 'none';
+}
 }
 function renderDevices() {
   const val = document.getElementById('fdevices').value;
