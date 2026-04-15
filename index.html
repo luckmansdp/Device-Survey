@@ -109,23 +109,23 @@
           <input type="text" id="fname" placeholder="Jane Smith" autocomplete="name" />
         </div>
         <div class="field">
-          <label for="femail">Email address</label>
-          <div style="position:relative;">
-            <input type="email" id="femail" placeholder="jane@company.com" autocomplete="off" oninput="suggestEmail();" />
-            <div id="email-suggestions" style="
-              position:absolute;
-              top:42px;
-              left:0;
-              right:0;
-              background:#fff;
-              border:1px solid #E2DED6;
-              border-radius:6px;
-              box-shadow:0 2px 6px rgba(0,0,0,0.08);
-              display:none;
-              z-index:10;
-            "></div>
-          </div>
-        </div>
+         <label for="femail">Email address</label>
+       
+         <div style="display:flex; align-items:center; border:1px solid var(--border2); border-radius: var(--radius-sm); overflow:hidden; background: var(--surface);">
+           
+           <input 
+             type="text" 
+             id="femail" 
+             placeholder="jane" 
+             style="border:none; flex:1; padding:0 12px; height:40px; outline:none;"
+           />
+       
+           <div style="padding:0 12px; color:var(--text2); font-size:14px; background: var(--surface2); height:40px; display:flex; align-items:center;">
+             @luckmans.com
+           </div>
+       
+         </div>
+       </div>
       </div>
     </div>
 
@@ -244,8 +244,7 @@ function renderDevices() {
 
 async function submitForm() {
   const name = document.getElementById('fname').value.trim();
-  const email = document.getElementById('femail').value.trim();
-  const deviceSel = document.getElementById('fdevices').value;
+  const username = document.getElementById('femail').value.trim().toLowerCase();
 
   const successEl = document.getElementById('msg-success');
   const errorEl = document.getElementById('msg-error');
@@ -254,7 +253,23 @@ async function submitForm() {
   errorEl.style.display = 'none';
 
   if (!name) return alert('Please enter your full name.');
-  if (!email || !email.includes('@') || !email.includes('.')) return alert('Enter valid email.');
+
+  if (!username) {
+    alert('Please enter your email username.');
+    return;
+  }
+
+  if (username.includes(" ")) {
+    alert("Email cannot contain spaces");
+    return;
+  }
+  if (!/^[a-z0-9._]+$/.test(username)) {
+  alert("Only letters, numbers, dot and underscore allowed");
+  return;
+  }
+  const email = username.replace(/\.+$/, '') + "@luckmans.com";
+
+  const deviceSel = document.getElementById('fdevices').value;
   if (!deviceSel) return alert('Select number of devices.');
 
   const isNA = deviceSel === 'na';
