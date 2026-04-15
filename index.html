@@ -176,7 +176,7 @@
 </div>
 <script>
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4m7TD_73X4gtyFMicz0pXN6m3KBEDmHJKXuoD2-RQ/dev';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCeyjGOMeeLwMITZsVjWbDXpjwnLlQUSdzKjKqJIvHZ2fuoIZ9Z9FU9ywRyt3uZ4AuDQ/exec';
 
 let cachedResponses = null;
 
@@ -206,9 +206,18 @@ function renderDevices() {
     block.innerHTML = `
       <div class="device-num">Device ${i}</div>
       <div class="field-row-3">
-        <div class="field"><label>Make</label><input type="text" id="make${i}" /></div>
-        <div class="field"><label>Model</label><input type="text" id="model${i}" /></div>
-        <div class="field"><label>OS version</label><input type="text" id="os${i}" /></div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:12px;">Make</label>
+          <input type="text" id="make${i}" placeholder="Apple" />
+        </div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:12px;">Model</label>
+          <input type="text" id="model${i}" placeholder="iPhone 15 Pro" />
+        </div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:12px;">OS version</label>
+          <input type="text" id="os${i}" placeholder="iOS 17.4" />
+        </div>
       </div>`;
     wrap.appendChild(block);
   }
@@ -363,8 +372,9 @@ function suggestEmail() {
 }
 
 document.addEventListener("click", function(e) {
+  const box = document.getElementById("email-suggestions");
   if (!e.target.closest("#email-suggestions") && e.target.id !== "femail") {
-    document.getElementById("email-suggestions").style.display = "none";
+    box.style.display = "none";
   }
 });
 
