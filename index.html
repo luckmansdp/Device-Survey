@@ -334,7 +334,43 @@ function renderResults(responses) {
 }
 
 function exportCSV() {
-  alert("Export already works in your original version");
+  if (!cachedResponses || !cachedResponses.length) {
+    alert('No responses to export yet.');
+    return;
+  }
+
+  const rows = [['Submitted','Name','Email','Status','Device #','Make','Model','OS Version']];
+
+  cachedResponses.forEach(r => {
+    if (r.isNA) {
+      rows.push([r.ts, r.name, r.email, 'Not applicable','','','','']);
+    } else if (!r.devices || r.devices.length === 0) {
+      rows.push([r.ts, r.name, r.email, 'Has devices','','','','']);
+    } else {
+      r.devices.forEach((d, i) => {
+        rows.push([
+          i === 0 ? r.ts : '',
+          i === 0 ? r.name : '',
+          i === 0 ? r.email : '',
+          i === 0 ? 'Has devices' : '',
+          i + 1,
+          d.make,
+          d.model,
+          d.os
+        ]);
+      });
+    }
+  });
+
+  const csv = rows.map(row =>
+    row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')
+  ).join('\r\n');
+
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'device_survey_results.csv';
+  a.click();
 }
 
 /* ================= EMAIL SUGGESTION ================= */
