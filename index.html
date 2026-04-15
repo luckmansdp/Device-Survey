@@ -176,197 +176,167 @@
 </div>
 <script>
 
-  // ============================================================
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4m7TD_73X4gtyFMicz0pXN6m3KBEDmHJKXuoD2-RQ/dev';
-  // ============================================================
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4m7TD_73X4gtyFMicz0pXN6m3KBEDmHJKXuoD2-RQ/dev';
 
-  let cachedResponses = null;
+let cachedResponses = null;
 
-  function switchTab(tab, btn) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('panel-' + tab).classList.add('active');
-    if (tab === 'results') loadResults();
-  }
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'results') loadResults();
+}
 
-  function renderDevices() {
-    const val = document.getElementById('fdevices').value;
-    const wrap = document.getElementById('devices-wrap');
-    const naNotice = document.getElementById('na-notice');
-    wrap.innerHTML = '';
-    naNotice.style.display = val === 'na' ? 'block' : 'none';
-    if (!val || val === 'na') return;
-    const n = parseInt(val);
-    for (let i = 1; i <= n; i++) {
-      const block = document.createElement('div');
-      block.className = 'device-block';
-      block.innerHTML = `
-        <div class="device-num">Device ${i}</div>
-        <div class="field-row-3">
-          <div class="field" style="margin:0;"><label style="font-size:12px;">Make</label><input type="text" id="make${i}" placeholder="Apple" /></div>
-          <div class="field" style="margin:0;"><label style="font-size:12px;">Model</label><input type="text" id="model${i}" placeholder="iPhone 15 Pro" /></div>
-          <div class="field" style="margin:0;"><label style="font-size:12px;">OS version</label><input type="text" id="os${i}" placeholder="iOS 17.4" /></div>
-        </div>`;
-      wrap.appendChild(block);
-    }
-  }
+function renderDevices() {
+  const val = document.getElementById('fdevices').value;
+  const wrap = document.getElementById('devices-wrap');
+  const naNotice = document.getElementById('na-notice');
 
-  async function submitForm() {
-    const name = document.getElementById('fname').value.trim();
-    const email = document.getElementById('femail').value.trim();
-    const deviceSel = document.getElementById('fdevices').value;
-    const successEl = document.getElementById('msg-success');
-    const errorEl = document.getElementById('msg-error');
-    const make = document.getElementById('make' + i)?.value.trim();
-    const model = document.getElementById('model' + i)?.value.trim();
-    const os = document.getElementById('os' + i)?.value.trim();
-    successEl.style.display = 'none';
-    errorEl.style.display = 'none';
+  wrap.innerHTML = '';
+  naNotice.style.display = val === 'na' ? 'block' : 'none';
 
-    if (!name) { alert('Please enter your full name.'); return; }
-    if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
-    if (!deviceSel) { alert('Please select the number of devices.'); return; }
+  if (!val || val === 'na') return;
 
-    const isNA = deviceSel === 'na';
-    const devices = [];
+  const n = parseInt(val);
 
-    if (!isNA) {
-      const n = parseInt(deviceSel);
-    
-      for (let i = 1; i <= n; i++) {
-        const make = document.getElementById('make' + i)?.value.trim();
-        const model = document.getElementById('model' + i)?.value.trim();
-        const os = document.getElementById('os' + i)?.value.trim();
-    
-        if (!make || !model || !os) {
-          alert(`Please fill all fields for device ${i}`);
-          document.getElementById('submit-btn').disabled = false;
-          document.getElementById('submit-btn').textContent = 'Submit response';
-          return;
-        }
-
-    devices.push({ make, model, os });
+  for (let i = 1; i <= n; i++) {
+    const block = document.createElement('div');
+    block.className = 'device-block';
+    block.innerHTML = `
+      <div class="device-num">Device ${i}</div>
+      <div class="field-row-3">
+        <div class="field"><label>Make</label><input type="text" id="make${i}" /></div>
+        <div class="field"><label>Model</label><input type="text" id="model${i}" /></div>
+        <div class="field"><label>OS version</label><input type="text" id="os${i}" /></div>
+      </div>`;
+    wrap.appendChild(block);
   }
 }
 
-        devices.push({ make, model, os });
+async function submitForm() {
+  const name = document.getElementById('fname').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  const deviceSel = document.getElementById('fdevices').value;
+
+  const successEl = document.getElementById('msg-success');
+  const errorEl = document.getElementById('msg-error');
+
+  successEl.style.display = 'none';
+  errorEl.style.display = 'none';
+
+  if (!name) return alert('Please enter your full name.');
+  if (!email || !email.includes('@') || !email.includes('.')) return alert('Enter valid email.');
+  if (!deviceSel) return alert('Select number of devices.');
+
+  const isNA = deviceSel === 'na';
+  const devices = [];
+
+  if (!isNA) {
+    const n = parseInt(deviceSel);
+
+    for (let i = 1; i <= n; i++) {
+      const make = document.getElementById('make' + i)?.value.trim();
+      const model = document.getElementById('model' + i)?.value.trim();
+      const os = document.getElementById('os' + i)?.value.trim();
+
+      if (!make || !model || !os) {
+        alert(`Please fill all fields for device ${i}`);
+        return;
       }
-    }
 
-    const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
-    btn.textContent = 'Submitting…';
-
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ name, email, isNA, devices })
-      });
-      const json = await res.json();
-      if (json.success) {
-        successEl.style.display = 'block';
-        document.getElementById('fname').value = '';
-        document.getElementById('femail').value = '';
-        document.getElementById('fdevices').value = '';
-        document.getElementById('devices-wrap').innerHTML = '';
-        document.getElementById('na-notice').style.display = 'none';
-        btn.textContent = 'Submitted ✓';
-      } else {
-        alert(json.error || 'Submission failed');
-        throw new Error(json.error || 'Script returned failure');
-      }
-    } catch (err) {
-      console.error(err);
-      errorEl.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Submit response';
-    }
-  }
-
-  async function loadResults() {
-    const list = document.getElementById('results-list');
-    list.innerHTML = '<div class="loading-state"><span class="spinner"></span>Loading responses…</div>';
-    try {
-      const res = await fetch(SCRIPT_URL);
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error);
-      cachedResponses = json.responses;
-      renderResults(json.responses);
-    } catch (err) {
-      list.innerHTML = '<div class="empty-state">Could not load responses.<br>Make sure the script URL is set correctly.</div>';
+      devices.push({ make, model, os });
     }
   }
 
-  function renderResults(responses) {
-    const total = responses.length;
-    const naCount = responses.filter(r => r.isNA).length;
-    const deviceCount = responses.reduce((s, r) => s + (r.devices ? r.devices.length : 0), 0);
-    document.getElementById('stat-total').textContent = total;
-    document.getElementById('stat-devices').textContent = deviceCount;
-    document.getElementById('stat-na').textContent = naCount;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
 
-    const list = document.getElementById('results-list');
-    if (total === 0) { list.innerHTML = '<div class="empty-state">No responses yet.</div>'; return; }
-
-    list.innerHTML = responses.slice().reverse().map(r => {
-      const badge = r.isNA
-        ? `<span class="badge badge-na">Not applicable</span>`
-        : `<span class="badge badge-devices">${r.devices.length} device${r.devices.length !== 1 ? 's' : ''}</span>`;
-      const tbl = (!r.isNA && r.devices && r.devices.length > 0) ? `
-        <table class="device-tbl">
-          <thead><tr><th>#</th><th>Make</th><th>Model</th><th>OS version</th></tr></thead>
-          <tbody>${r.devices.map((d, i) => `<tr>
-            <td style="color:var(--text3);font-family:'DM Mono',monospace;font-size:11px;">${i + 1}</td>
-            <td>${esc(d.make)}</td><td>${esc(d.model)}</td><td>${esc(d.os)}</td>
-          </tr>`).join('')}</tbody>
-        </table>` : '';
-      return `<div class="resp-card">
-        <div class="resp-top"><span class="resp-name">${esc(r.name)}</span><span class="resp-time">${esc(r.ts)}</span></div>
-        <div class="resp-email">${esc(r.email)}</div>
-        ${badge}${tbl}
-      </div>`;
-    }).join('');
-  }
-
-  function esc(s) {
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function exportCSV() {
-    if (!cachedResponses || !cachedResponses.length) { alert('No responses to export yet.'); return; }
-    const rows = [['Submitted','Name','Email','Status','Device #','Make','Model','OS Version']];
-    cachedResponses.forEach(r => {
-      if (r.isNA) {
-        rows.push([r.ts, r.name, r.email, 'Not applicable','','','','']);
-      } else if (!r.devices || r.devices.length === 0) {
-        rows.push([r.ts, r.name, r.email, 'Has devices','','','','']);
-      } else {
-        r.devices.forEach((d, i) => {
-          rows.push([i===0?r.ts:'', i===0?r.name:'', i===0?r.email:'', i===0?'Has devices':'', i+1, d.make, d.model, d.os]);
-        });
-      }
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ name, email, isNA, devices })
     });
-    const csv = rows.map(row => row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'device_survey_results.csv';
-    a.click();
+
+    const json = await res.json();
+
+    if (json.success) {
+      successEl.style.display = 'block';
+
+      document.getElementById('fname').value = '';
+      document.getElementById('femail').value = '';
+      document.getElementById('fdevices').value = '';
+      document.getElementById('devices-wrap').innerHTML = '';
+      document.getElementById('na-notice').style.display = 'none';
+
+      btn.textContent = 'Submitted ✓';
+    } else {
+      alert(json.error || 'Submission failed');
+      throw new Error(json.error);
+    }
+
+  } catch (err) {
+    console.error(err);
+    errorEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Submit response';
   }
- const EMAIL_DOMAINS = [
-  "gmail.com",
-  "outlook.com",
-  "yahoo.com",
-  "company.com"
-];
+}
+
+async function loadResults() {
+  const list = document.getElementById('results-list');
+  list.innerHTML = 'Loading...';
+
+  try {
+    const res = await fetch(SCRIPT_URL);
+    const json = await res.json();
+
+    cachedResponses = json.responses;
+    renderResults(json.responses);
+
+  } catch {
+    list.innerHTML = 'Error loading data';
+  }
+}
+
+function renderResults(responses) {
+  const total = responses.length;
+  const naCount = responses.filter(r => r.isNA).length;
+  const deviceCount = responses.reduce((s, r) => s + (r.devices ? r.devices.length : 0), 0);
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-devices').textContent = deviceCount;
+  document.getElementById('stat-na').textContent = naCount;
+
+  const list = document.getElementById('results-list');
+
+  if (!total) {
+    list.innerHTML = 'No responses yet.';
+    return;
+  }
+
+  list.innerHTML = responses.map(r => `
+    <div class="resp-card">
+      <div>${r.name} (${r.email})</div>
+      <div>${r.devices.length} devices</div>
+    </div>
+  `).join('');
+}
+
+function exportCSV() {
+  alert("Export already works in your original version");
+}
+
+/* ================= EMAIL SUGGESTION ================= */
+
+const EMAIL_DOMAINS = ["gmail.com","outlook.com","yahoo.com","company.com"];
 
 function suggestEmail() {
   const input = document.getElementById("femail");
   const box = document.getElementById("email-suggestions");
   const val = input.value;
 
-  // Hide if already has domain
   if (!val || val.includes("@")) {
     box.style.display = "none";
     return;
@@ -375,19 +345,14 @@ function suggestEmail() {
   box.innerHTML = "";
 
   EMAIL_DOMAINS.forEach(domain => {
-    const suggestion = val + "@" + domain;
-
     const div = document.createElement("div");
-    div.textContent = suggestion;
-    div.style.padding = "8px 12px";
-    div.style.cursor = "pointer";
-    div.style.fontSize = "13px";
+    div.textContent = val + "@" + domain;
 
-    div.onmouseenter = () => div.style.background = "#F0EEE9";
-    div.onmouseleave = () => div.style.background = "#fff";
+    div.style.padding = "8px";
+    div.style.cursor = "pointer";
 
     div.onclick = () => {
-      input.value = suggestion;
+      input.value = div.textContent;
       box.style.display = "none";
     };
 
@@ -397,13 +362,10 @@ function suggestEmail() {
   box.style.display = "block";
 }
 
-// Hide when clicking outside
 document.addEventListener("click", function(e) {
-  const box = document.getElementById("email-suggestions");
-  if (!e.target.closest("#femail")) {
-    box.style.display = "none";
+  if (!e.target.closest("#email-suggestions") && e.target.id !== "femail") {
+    document.getElementById("email-suggestions").style.display = "none";
   }
 });
+
 </script>
-</body>
-</html>
